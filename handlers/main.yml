@@ -1,0 +1,9 @@
+---
+- name: Daemon_reload
+  ansible.builtin.service:
+    daemon_reload: true
+
+- name: Restart_monerod
+  ansible.builtin.service:
+    name: "monerod"
+    state: restarted

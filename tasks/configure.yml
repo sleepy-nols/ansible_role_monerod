@@ -1,0 +1,10 @@
+---
+- name:
+  ansible.builtin.template:
+    src: templates/monerod.conf
+    dest: "{{ monerod_config_dir }}"
+    owner: "{{ monerod_unix_user }}"
+    group: "{{ monerod_unix_group }}"
+    mode: "0700"
+  diff: true
+  notify: Restart_monerod

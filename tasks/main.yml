@@ -1,0 +1,13 @@
+---
+- name: Prepare host
+  include_tasks: prepare_host.yml
+
+- name: Download monerod
+  include_tasks: download.yml
+  when: not (monerod_skip_install | bool)
+
+- name: Configure monerod
+  include_tasks: configure.yml
+
+- name: Make systmed unit
+  include_tasks: systemd.yml

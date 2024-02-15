@@ -1,0 +1,29 @@
+---
+- name: Download monero binaries
+  get_url:
+    url: "https://downloads.getmonero.org/linux64"
+    dest: "{{ monerod_download_dir }}/monero.tar.bz2"
+    owner: "{{ monerod_unix_user }}"
+    group: "{{ monerod_unix_group }}"
+    mode: "0700"
+  register: monerod_bin_downloads
+  notify: Restart_monerod
+
+- name: Get release info
+  command: "bsdtar -tf {{ monerod_download_dir }}/monero.tar.bz2"
+  register: monerod_release_tar_list
+  changed_when: false
+
+- name: Set release info
+  set_fact:
+    monerod_release_version: "{{ monerod_release_tar_list.stdout_lines.0 | regex_search('(?<=monero-x86_64-linux-gnu-v)\\d{1,3}.\\d{1,3}.\\d{1,3}.\\d{1,3}') }}"
+    monerod_release_path: "{{ monerod_release_tar_list.stdout_lines.0 | regex_search('monero-x86_64-linux-gnu-v\\d{1,3}.\\d{1,3}.\\d{1,3}.\\d{1,3}') }}"
+
+- name: Show version
+  debug:
+    msg: "Latest version already installed: v{{ monerod_release_version }}"
+  when: not monerod_bin_downloads.changed | bool
+
+- name: Make new release
+  include_tasks: install.yml
+  when: (monerod_bin_downloads.changed | bool) or (monerod_force_install | bool)

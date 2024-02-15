@@ -1,0 +1,59 @@
+---
+- name: Print release version
+  debug:
+    msg: "{{ monerod_release_version }}"
+
+- name: Initialize the deploy root and gather facts
+  community.general.deploy_helper:
+    path: "{{ monerod_release_dir }}"
+    release: "{{ monerod_release_version }}"
+    owner: "{{ monerod_unix_user }}"
+    group: "{{ monerod_unix_group }}"
+    mode: "0710"
+
+- name: Make new release path
+  ansible.builtin.file:
+    path: "{{ deploy_helper.new_release_path }}"
+    state: directory
+    owner: "{{ monerod_unix_user }}"
+    group: "{{ monerod_unix_group }}"
+    mode: "0710"
+
+- name: Copy binaries from download dir to release dir
+  ansible.builtin.copy:
+    src: "{{ monerod_download_dir }}/monero.tar.bz2"
+    dest: "{{ deploy_helper.new_release_path }}"
+    remote_src: true
+    owner: "{{ monerod_unix_user }}"
+    group: "{{ monerod_unix_group }}"
+    mode: "0710"
+
+- name: Add an unfinished file, to allow cleanup on successful finalize
+  ansible.builtin.file:
+    path: '{{ deploy_helper.new_release_path }}/{{ deploy_helper.unfinished_filename }}'
+    state: touch
+    owner: "{{ monerod_unix_user }}"
+    group: "{{ monerod_unix_group }}"
+    mode: "0710"
+
+- name: Unpack binaries
+  ansible.builtin.unarchive:
+    src: "{{ deploy_helper.new_release_path }}/monero.tar.bz2"
+    dest: "{{ deploy_helper.new_release_path }}"
+    remote_src: true
+    owner: "{{ monerod_unix_user }}"
+    group: "{{ monerod_unix_group }}"
+    mode: "0710"
+
+- name: Finalize the deploy, removing the unfinished file and switching the symlink
+  community.general.deploy_helper:
+    path: "{{ monerod_release_dir }}"
+    release: "{{ monerod_release_version }}"
+    state: finalize
+  notify: Restart_monerod
+
+- name: Symlink monerod bin to bin directory
+  ansible.builtin.file:
+    src: "{{ monerod_release_dir }}/current/{{ monerod_release_path }}/monerod"
+    dest: "/usr/local/bin/monerod"
+    state: link

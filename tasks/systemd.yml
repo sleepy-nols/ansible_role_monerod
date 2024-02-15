@@ -1,0 +1,17 @@
+---
+- name: Make systemd unit
+  ansible.builtin.template:
+    src: "templates/monerod.service"
+    dest: "/etc/systemd/system/monerod.service"
+    owner: root
+    group: root
+    mode: "0700"
+  diff: true
+  notify:
+    - Daemon_reload
+    - Restart_monerod
+
+- name: Enable monerod service
+  ansible.builtin.service:
+    name: "monerod"
+    enabled: true

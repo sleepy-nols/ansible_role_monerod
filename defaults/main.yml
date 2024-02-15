@@ -1,0 +1,39 @@
+---
+monerod_name: "monero"
+monerod_unix_user: "{{ monerod_name }}"
+monerod_unix_group: "{{ monerod_name }}"
+
+monerod_config_dir: "/etc/monerod"
+monerod_log_dir: "/var/log/monerod"
+monerod_run_dir: "/run/monerod"
+monerod_lib_dir: "/var/lib/monero"
+monerod_data_dir: "/var/lib/monerod/.bitmonero"
+monerod_bin_path: "/usr/local/bin/monerod"
+monerod_log_file: "/var/log/monerod/monerod.log"
+
+monerod_release_dir: "/opt/monerod"
+monerod_download_dir: "/opt/monerod/download"
+
+monerod_bin_url: "https://downloads.getmonero.org/linux64"
+monerod_dependecies:
+  - "bzip2"
+  - "libarchive-tools"
+
+monerod_public_node: false
+monerod_prune_blockchain: false
+monerod_enable_dns_blocklist: true
+monerod_no-zqm: true
+monerod_no_idg: true
+
+monerod_p2p_bind_ip: "0.0.0.0"
+monerod_p2p_bind_port: 18080
+
+monerod_rpc_restricted_bind_ip: "0.0.0.0"
+monerod_rpc_restricted_bind_port: 18081
+
+
+
+
+monerod_skip_install: false
+monerod_force_install: false
+monerod_port: 18080

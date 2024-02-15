@@ -1,0 +1,30 @@
+---
+- name: Make unix group
+  ansible.builtin.group:
+    name: "{{ monerod_unix_group }}"
+    state: present
+
+- name: Make unix user
+  ansible.builtin.user:
+    name: "{{ monerod_unix_user }}"
+    state: present
+    group: "{{ monerod_unix_group }}"
+    shell: "/bin/false"
+    home: "{{ monerod_lib_dir }}"
+
+- name: Make directories
+  ansible.builtin.file:
+    name: "{{ item }}"
+    state: directory
+    owner: "{{ monerod_unix_user }}"
+    group: "{{ monerod_unix_group }}"
+    mode: "0710"
+  loop:
+    - "{{ monerod_log_dir }}"
+    - "{{ monerod_config_dir }}"
+    - "{{ monerod_release_dir }}"
+    - "{{ monerod_download_dir}}"
+
+- name: Install dependencies
+  apt:
+    pkg: "{{ monerod_dependecies }}"
